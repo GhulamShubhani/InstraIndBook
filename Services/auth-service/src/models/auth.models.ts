@@ -4,7 +4,6 @@ import ApiError from "../utils/ApiError";
 import bcrypt from "bcrypt";
 import { NextFunction } from "express";
 
-
 const AuthSchema: Schema = new Schema<IAuth>(
   {
     authId: {
@@ -46,8 +45,8 @@ const AuthSchema: Schema = new Schema<IAuth>(
     },
     registrationMethod: {
       type: String,
-      enum: ["email", "google"],
-      default: "email",
+      enum: ["manual", "automated"],
+      default: "manual",
     },
 
     phoneE164: { type: String, default: null, trim: true },
@@ -100,7 +99,14 @@ const AuthSchema: Schema = new Schema<IAuth>(
       default: "user",
     },
 
-    
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    acceptedTerms: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: {
@@ -118,7 +124,7 @@ AuthSchema.set("toObject", { getters: true, virtuals: true });
 AuthSchema.index({ email: 1 }, { unique: true });
 AuthSchema.index({ authId: 1 }, { unique: true });
 
-AuthSchema.pre("save", async function (next:NextFunction) {
+AuthSchema.pre("save", async function (next: NextFunction) {
   if (!this.isModified("password")) return next();
   try {
     const password = String(this.password);
@@ -148,7 +154,5 @@ AuthSchema.methods.isPasswordCorrect = async function (
     }
   }
 };
-
-
 
 export const AuthModel = mongoose.model<IAuth>("Auth", AuthSchema);

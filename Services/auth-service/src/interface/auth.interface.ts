@@ -1,10 +1,10 @@
 import { Document } from "mongoose";
 
-export type RegistrationMethod = "email" | "google";
+export type RegistrationMethod = "manual" | "automated";
 
 export interface IAuth extends Document {
   authId: string;
-  email: string;
+  email?: string;
   password: string;
 
   firebaseUID?: string;
@@ -33,15 +33,18 @@ export interface IAuth extends Document {
 
   createdAt?: Date;
   updatedAt?: Date;
+
+  isDeleted?: boolean;
+  acceptedTerms?: boolean;
+  isPasswordCorrect(password: string): Promise<boolean>;
 }
 
 export type UserCreatedPayload = {
-  userId: string;           // stable id you generated in Auth (UUID/ULID)
+  userId: string; // stable id you generated in Auth (UUID/ULID)
   email: string;
   firstName: string;
   lastName: string;
   phoneE164?: string | null;
   phoneCallingCode?: string | null; // "91"
-  countryIso2?: string | null;      // "IN"
+  countryIso2?: string | null; // "IN"
 };
-
